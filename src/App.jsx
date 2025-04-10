@@ -1,10 +1,21 @@
-import React from 'react'
-import Home from './pages/Home/Home'
+import React from "react";
+import Home from "./pages/Home/Home";
+import FullProductPage from "./pages/FullProductPage/FullProductPage";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Cart from "./pages/Cart/Cart";
+import Signup from "./pages/Signup/Signup";
 
 export default function App() {
   return (
     <>
-    <Home/>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Signup />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/product/:id" element={<FullProductPage />} />
+          <Route path="/cart" element={<Cart />} />
+        </Routes>
+      </Router>
     </>
-  )
+  );
 }

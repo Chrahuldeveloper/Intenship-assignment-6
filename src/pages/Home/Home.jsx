@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Navbar ,Product} from '../../components/index';
-import './Home.css';
+import React, { useState } from "react";
+import { Navbar, Product } from "../../components/index";
+import "./Home.css";
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [category, setCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState("All");
 
   return (
     <>
@@ -17,7 +17,6 @@ export default function Home() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-
         <select
           className="category-select"
           value={category}
@@ -30,7 +29,7 @@ export default function Home() {
           <option value="home">Home</option>
         </select>
       </div>
-      <Product/>
+      <Product />
     </>
   );
 }
