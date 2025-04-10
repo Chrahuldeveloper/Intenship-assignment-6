@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "./Product.css";
 
 const dummyProducts = [
@@ -28,7 +28,7 @@ const dummyProducts = [
     price: 149.99,
     category: "accessories",
     image:
-    "https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
     Description:
       "Premium cotton t-shirt with a minimalist design, perfect for casual wear.",
   },
@@ -55,9 +55,28 @@ const dummyProducts = [
 ];
 
 export default function Product() {
+  const [productsData, setproductsData] = useState([]);
+
+
+  const fetchProducts = useCallback(async () => {
+    try {
+      const products = await fetch("https://fakestoreapi.com/products");
+      const data = await products.json();
+      console.log(data);
+      setproductsData(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+  
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
   return (
     <div className="product-grid">
-      {dummyProducts.map((item) => (
+      {productsData.map((item) => (
         <div className="product-card" key={item.id}>
           <div className="img-container">
             <img src={item.image} alt={item.title} />
