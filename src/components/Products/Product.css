@@ -47,7 +47,10 @@
     margin: 1rem 0 0.4rem;
     font-size: 1rem;
     font-weight: 600;
+    color: black;
   }
+
+  
   
   .product-card .price {
     font-weight: bold;

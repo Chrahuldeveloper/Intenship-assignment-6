@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import "./Product.css";
-
+import { Link } from "react-router-dom";
 
 export default function Product() {
   const [productsData, setproductsData] = useState([]);
-
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -16,7 +15,6 @@ export default function Product() {
       console.log(error);
     }
   }, []);
-  
 
   useEffect(() => {
     fetchProducts();
@@ -27,7 +25,18 @@ export default function Product() {
       {productsData.map((item) => (
         <div className="product-card" key={item.id}>
           <div className="img-container">
-            <img src={item.image} alt={item.title} />
+            <Link
+              to={`/product/${item.title}`}
+              state={{
+                image: item.image,
+                title: item.title,
+                description: item.description,
+                Price: item.price,
+                category: item.category,
+              }}
+            >
+              <img src={item.image} alt={item.title} />
+            </Link>
           </div>
           <h3>{item.title}</h3>
           <p className="price">${item.price}</p>
