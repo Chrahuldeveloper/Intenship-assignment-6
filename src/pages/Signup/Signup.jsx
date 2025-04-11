@@ -40,8 +40,8 @@ export default function Signup() {
       }
 
       const data = await res.json();
-      console.log("User created:", data);
-      localStorage.setItem("jwt", data);
+      console.log("User created:", data.id);
+      localStorage.setItem("jwt", data.id);
       setMessage("Signup successful!");
 
       setTimeout(() => {
