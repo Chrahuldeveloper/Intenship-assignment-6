@@ -126,7 +126,6 @@ export default function Cart() {
                 </Link>
               </div>
             )}
-            
             {showConfirmation && (
               <div className="confirmation-popup">
                 <div className="confirmation-content">

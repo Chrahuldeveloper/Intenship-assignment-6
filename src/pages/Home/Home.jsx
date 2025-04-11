@@ -23,13 +23,13 @@ export default function Home() {
           onChange={(e) => setCategory(e.target.value)}
         >
           <option value="All">All</option>
-          <option value="clothing">Clothing</option>
-          <option value="accessories">Accessories</option>
+          <option value="men's clothing">Men's Clothing</option>
+          <option value="women's clothing">Women's Clothing</option>
+          <option value="jewelery">Jewelry</option>
           <option value="electronics">Electronics</option>
-          <option value="home">Home</option>
         </select>
       </div>
-      <Product />
+      <Product searchQuery={searchQuery} category={category} />
     </>
   );
 }
