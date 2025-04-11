@@ -6,12 +6,57 @@ import { Link, useLocation } from "react-router-dom";
 export default function Cart() {
   const location = useLocation();
   const [cartItems, setCartItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  
   useEffect(() => {
-    if (location.state?.product) {
-      setCartItems([{...location.state.product, quantity: 1}]);
-    }
+    const fetchCartData = async () => {
+      setIsLoading(true);
+      try {
+        const cartId = location.state?.cartId || 1;
+        
+        const response = await fetch(`https://fakestoreapi.com/carts/${cartId}`);
+        const cartData = await response.json();
+        
+        if (!cartData || !cartData.products || cartData.products.length === 0) {
+          if (location.state?.product) {
+            setCartItems([{
+              ...location.state.product,
+              quantity: location.state.quantity || 1
+            }]);
+          } else {
+            setCartItems([]);
+          }
+        } else {
+          const productDetails = await Promise.all(
+            cartData.products.map(async (item) => {
+              const productResponse = await fetch(`https://fakestoreapi.com/products/${item.productId}`);
+              const product = await productResponse.json();
+              return {
+                ...product,
+                quantity: item.quantity
+              };
+            })
+          );
+          
+          setCartItems(productDetails);
+        }
+      } catch (err) {
+        console.error("Error fetching cart:", err);
+        setError("Failed to load cart data");
+        
+        if (location.state?.product) {
+          setCartItems([{
+            ...location.state.product,
+            quantity: location.state.quantity || 1
+          }]);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchCartData();
   }, [location.state]);
 
   const formatPrice = (price) => {
@@ -28,34 +73,104 @@ export default function Cart() {
 
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => 
-      total + (formatPrice(item.Price) * item.quantity), 0).toFixed(2);
+      total + (formatPrice(item.price || item.Price) * item.quantity), 0).toFixed(2);
   };
 
-  const updateQuantity = (index, change) => {
+  const updateQuantity = async (index, change) => {
     const updatedCart = [...cartItems];
     const newQuantity = updatedCart[index].quantity + change;
     
     if (newQuantity <= 0) {
+      // Remove item
       removeItem(index);
     } else {
-      updatedCart[index].quantity = newQuantity;
-      setCartItems(updatedCart);
+      try {
+        updatedCart[index].quantity = newQuantity;
+        setCartItems(updatedCart);
+        
+        const cartId = location.state?.cartId || 1;
+        const productId = updatedCart[index].id;
+        
+        await fetch(`https://fakestoreapi.com/carts/${cartId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            userId: 1,
+            date: new Date().toISOString().slice(0, 10),
+            products: updatedCart.map(item => ({
+              productId: item.id,
+              quantity: item.quantity
+            }))
+          })
+        });
+        
+      } catch (err) {
+        console.error("Error updating quantity:", err);
+        updatedCart[index].quantity = updatedCart[index].quantity - change;
+        setCartItems(updatedCart);
+      }
     }
   };
 
-  const removeItem = (index) => {
-    const updatedCart = cartItems.filter((_, i) => i !== index);
-    setCartItems(updatedCart);
+  const removeItem = async (index) => {
+    try {
+      const updatedCart = cartItems.filter((_, i) => i !== index);
+      setCartItems(updatedCart);
+      
+      const cartId = location.state?.cartId || 1;
+      
+      await fetch(`https://fakestoreapi.com/carts/${cartId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: 1,
+          date: new Date().toISOString().slice(0, 10),
+          products: updatedCart.map(item => ({
+            productId: item.id,
+            quantity: item.quantity
+          }))
+        })
+      });
+      
+    } catch (err) {
+      console.error("Error removing item:", err);
+    }
   };
 
-  const handleCheckout = () => {
-    setShowConfirmation(true);
-    setCartItems([]);
-    
-    setTimeout(() => {
-      setShowConfirmation(false);
-    }, 4000);
+  const handleCheckout = async () => {
+    try {
+      const cartId = location.state?.cartId || 1;
+      
+      await fetch(`https://fakestoreapi.com/carts/${cartId}`, {
+        method: 'DELETE'
+      });
+      
+      setShowConfirmation(true);
+      setCartItems([]);
+      
+      setTimeout(() => {
+        setShowConfirmation(false);
+      }, 4000);
+      
+    } catch (err) {
+      console.error("Error during checkout:", err);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <>
+        <Navbar />
+        <div className="cart-container">
+          <div className="loading">Loading cart data...</div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -81,7 +196,7 @@ export default function Cart() {
                 <div className="item-details">
                   <h3>{item.title}</h3>
                   <p className="item-category">{item.category}</p>
-                  <p className="item-price">${formatPrice(item.Price).toFixed(2)}</p>
+                  <p className="item-price">${formatPrice(item.price || item.Price).toFixed(2)}</p>
                   <div className="item-actions">
                     <div className="quantity-controls">
                       <button 
@@ -121,11 +236,12 @@ export default function Cart() {
                 >
                   Proceed to Checkout
                 </button>
-                <Link to="/home" className="continue-shopping">
+                <Link to="/" className="continue-shopping">
                   Continue Shopping
                 </Link>
               </div>
             )}
+            
             {showConfirmation && (
               <div className="confirmation-popup">
                 <div className="confirmation-content">

@@ -7,6 +7,13 @@
   font-family: 'Inter', sans-serif;
 }
 
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #555;
+  font-size: 1.2rem;
+}
+
 .cart-message {
   text-align: center;
   max-width: 500px;
@@ -169,7 +176,6 @@
   align-self: flex-end;
 }
 
-/* Confirmation popup */
 .confirmation-popup {
   position: fixed;
   top: 20px;

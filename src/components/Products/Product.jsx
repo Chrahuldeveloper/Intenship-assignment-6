@@ -24,22 +24,23 @@ export default function Product({ searchQuery, category }) {
 
   useEffect(() => {
     let result = productsData;
-    
+
     if (category !== "All") {
-      result = result.filter(product => 
-        product.category.toLowerCase() === category.toLowerCase()
+      result = result.filter(
+        (product) => product.category.toLowerCase() === category.toLowerCase()
       );
     }
-    
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(product => 
-        product.title.toLowerCase().includes(query) || 
-        product.description.toLowerCase().includes(query) ||
-        product.category.toLowerCase().includes(query)
+      result = result.filter(
+        (product) =>
+          product.title.toLowerCase().includes(query) ||
+          product.description.toLowerCase().includes(query) ||
+          product.category.toLowerCase().includes(query)
       );
     }
-    
+
     setFilteredProducts(result);
   }, [searchQuery, category, productsData]);
 
