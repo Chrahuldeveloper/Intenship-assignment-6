@@ -34,19 +34,19 @@ export default function Login() {
       });
 
       if (!res.ok) {
-        throw new Error("Signup failed");
+        throw new Error("Login failed");
       }
       const data = await res.json();
       console.log("User created:", data);
       localStorage.setItem("jwt", data);
-      setMessage("Signup successful!");
+      setMessage("Login successful!");
 
       setTimeout(() => {
         navigate("/home");
       }, 1500);
     } catch (error) {
       console.error("Error:", error);
-      setMessage("Signup failed. Please try again.");
+      setMessage("Login failed. Please try again.");
     }
   };
 
